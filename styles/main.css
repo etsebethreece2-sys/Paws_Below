@@ -1,0 +1,682 @@
+:root {
+  color-scheme: dark;
+  --hud-bg: rgba(12, 14, 16, 0.78);
+  --hud-line: rgba(255, 255, 255, 0.24);
+  --hud-text: #eef4f1;
+  --energy-fill: #ffd339;
+  --energy-fill-light: #fff071;
+  --energy-fill-dark: #d89518;
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #15191c;
+}
+
+.game-shell {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-width: 320px;
+  min-height: 320px;
+}
+
+.game-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 48%,
+    rgba(0, 0, 0, 0.288) 78%,
+    rgba(0, 0, 0, 0.576) 100%
+  );
+}
+
+#gameCanvas {
+  position: relative;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  touch-action: none;
+}
+
+.energy-hud {
+  position: absolute;
+  top: 4px;
+  z-index: 2;
+  color: var(--hud-text);
+  pointer-events: none;
+}
+
+.fade-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: #000000;
+  opacity: 0;
+}
+
+.fps-counter {
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  z-index: 4;
+  min-width: 58px;
+  padding: 4px 6px;
+  color: #d8ffe1;
+  background: rgba(6, 9, 8, 0.74);
+  border: 1px solid rgba(216, 255, 225, 0.36);
+  border-radius: 3px;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: 0.62rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+  pointer-events: none;
+  text-shadow: 1px 1px #020403;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.day-hud {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  z-index: 4;
+  min-width: 132px;
+  padding: 7px 12px 8px;
+  transform: translateX(-50%);
+  border: 2px solid #f2d29c;
+  border-radius: 4px;
+  color: #f8e6b8;
+  background: rgba(22, 14, 8, 0.84);
+  box-shadow: 0 2px 0 #1a1009;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    2px 0 #1a1009,
+    -2px 0 #1a1009,
+    0 2px #1a1009,
+    0 -2px #1a1009;
+  pointer-events: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.day-hud.is-rainy {
+  border-color: #b6d4e8;
+  color: #d9f1ff;
+  background: rgba(18, 27, 33, 0.86);
+}
+
+.energy-hud {
+  left: 2px;
+  width: min(380px, calc(100vw - 122px));
+}
+
+.depth-hud {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  z-index: 2;
+  width: clamp(92px, 11vw, 138px);
+  aspect-ratio: 1;
+  color: #f2d29c;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.depth-hud img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.energy-meter {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2508 / 627;
+}
+
+.energy-meter img {
+  display: block;
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.depth-hud strong {
+  position: absolute;
+  left: 50%;
+  top: 51%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  min-width: 40%;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: clamp(1.25rem, 2.4vw, 2.4rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-shadow:
+    2px 0 #1a1009,
+    -2px 0 #1a1009,
+    0 2px #1a1009,
+    0 -2px #1a1009,
+    2px 2px #1a1009;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.settings-button {
+  position: absolute;
+  top: 22px;
+  right: calc(24px + clamp(92px, 11vw, 138px));
+  z-index: 4;
+  width: 42px;
+  height: 30px;
+  padding: 0;
+  border: 2px solid #f2d29c;
+  border-radius: 4px;
+  color: #f8e6b8;
+  background: rgba(22, 14, 8, 0.84);
+  box-shadow: 0 2px 0 #1a1009;
+  cursor: pointer;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-shadow:
+    2px 0 #1a1009,
+    -2px 0 #1a1009,
+    0 2px #1a1009,
+    0 -2px #1a1009;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.settings-button:hover,
+.settings-button.is-open {
+  background: rgba(45, 28, 13, 0.92);
+}
+
+.settings-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #1a1009;
+}
+
+.settings-menu {
+  position: absolute;
+  top: 58px;
+  right: calc(24px + clamp(92px, 11vw, 138px));
+  z-index: 4;
+  width: min(260px, calc(100vw - 28px));
+  padding: 10px 12px 12px;
+  border: 2px solid #f2d29c;
+  border-radius: 4px;
+  color: #f4f1e8;
+  background: rgba(18, 13, 10, 0.92);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.28);
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-weight: 900;
+  text-shadow:
+    2px 0 #1a1009,
+    -2px 0 #1a1009,
+    0 2px #1a1009,
+    0 -2px #1a1009;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.settings-menu h2 {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.settings-menu label {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-top: 9px;
+  font-size: 0.62rem;
+  line-height: 1;
+}
+
+.settings-menu input[type="range"] {
+  width: 100%;
+  accent-color: #ffd35d;
+}
+
+.settings-menu .settings-toggle {
+  grid-template-columns: 1fr auto;
+}
+
+.settings-menu input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #ffd35d;
+}
+
+.ore-inventory-hud {
+  position: absolute;
+  left: 0;
+  top: clamp(70px, 12vh, 108px);
+  z-index: 3;
+  height: min(79.2vh, 726px);
+  aspect-ratio: 437 / 1618;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+
+.ore-inventory-hud img {
+  position: absolute;
+  left: -14.42%;
+  top: -1.73%;
+  display: block;
+  width: auto;
+  height: 109.64%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.ore-inventory-locks,
+.ore-inventory-locks span,
+.ore-inventory-locks span::before,
+.ore-inventory-locks span::after {
+  position: absolute;
+}
+
+.ore-inventory-locks {
+  inset: 0;
+}
+
+.ore-inventory-locks span {
+  left: 0;
+  width: 100%;
+  height: 6.25%;
+}
+
+.ore-inventory-locks span:nth-child(1) {
+  top: 15.1%;
+}
+
+.ore-inventory-locks span:nth-child(2) {
+  top: 22.6%;
+}
+
+.ore-inventory-locks span:nth-child(3) {
+  top: 30.1%;
+}
+
+.ore-inventory-locks span:nth-child(4) {
+  top: 37.6%;
+}
+
+.ore-inventory-locks span:nth-child(5) {
+  top: 45.1%;
+}
+
+.ore-inventory-locks span:nth-child(6) {
+  top: 52.6%;
+}
+
+.ore-inventory-locks span:nth-child(7) {
+  top: 60.1%;
+}
+
+.ore-inventory-locks span:nth-child(8) {
+  top: 67.6%;
+}
+
+.ore-inventory-locks span:nth-child(9) {
+  top: 75.1%;
+}
+
+.ore-inventory-locks span:nth-child(10) {
+  top: 82.6%;
+}
+
+.ore-inventory-locks span:nth-child(11) {
+  top: 90.1%;
+}
+
+.ore-inventory-locks span::before,
+.ore-inventory-locks span::after {
+  content: "?";
+  top: 0;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: #f3ead8;
+  background: rgba(4, 3, 3, 0.985);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 0 18px rgba(0, 0, 0, 0.92);
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.dirt-inventory-value,
+.pebblite-inventory-value,
+.coalclump-inventory-value,
+.copperpaw-inventory-value {
+  position: absolute;
+  z-index: 2;
+  min-width: 18%;
+  color: #f4f1e8;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: clamp(0.72rem, 1.55vw, 1.28rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: left;
+  text-shadow:
+    2px 0 #1a1009,
+    -2px 0 #1a1009,
+    0 2px #1a1009,
+    0 -2px #1a1009,
+    2px 2px #1a1009;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.dirt-inventory-value {
+  left: 56%;
+  top: 9.3%;
+}
+
+.pebblite-inventory-value {
+  left: 63%;
+  top: 16.8%;
+  display: none;
+}
+
+.coalclump-inventory-value {
+  left: 68%;
+  top: 24.3%;
+  display: none;
+}
+
+.copperpaw-inventory-value {
+  left: 70%;
+  top: 31.8%;
+  display: none;
+}
+
+.ore-inventory-locks span.is-unlocked::before,
+.ore-inventory-locks span.is-unlocked::after {
+  display: none;
+}
+
+.inventory-space-hud {
+  position: absolute;
+  left: 8px;
+  top: calc(clamp(70px, 12vh, 108px) + min(79.2vh, 726px) + 8px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 84px;
+  padding: 6px 9px 7px;
+  color: #f4f1e8;
+  background: rgba(18, 13, 10, 0.82);
+  border: 2px solid rgba(244, 241, 232, 0.28);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.24);
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: clamp(0.58rem, 1.25vw, 0.82rem);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow:
+    2px 0 #1a1009,
+    -2px 0 #1a1009,
+    0 2px #1a1009,
+    0 -2px #1a1009;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.inventory-space-hud strong {
+  min-width: 1.5em;
+  text-align: right;
+}
+
+.ore-inventory-locks span::before {
+  left: 7.5%;
+  width: 25.5%;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: clamp(0.95rem, 2.3vw, 2rem);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow:
+    2px 0 #1a1009,
+    -2px 0 #1a1009,
+    0 2px #1a1009,
+    0 -2px #1a1009;
+}
+
+.ore-inventory-locks span::after {
+  left: 35%;
+  width: 57%;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: clamp(0.8rem, 1.65vw, 1.35rem);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.surface-button,
+.sell-button,
+.sell-value {
+  position: absolute;
+  top: clamp(106px, calc(10px + 11vw), 154px);
+  right: 18px;
+  z-index: 3;
+  min-width: 92px;
+  padding: 7px 10px 8px;
+  border: 2px solid #f2d29c;
+  border-radius: 4px;
+  color: #f7e3b7;
+  background: rgba(22, 14, 8, 0.82);
+  box-shadow: 0 2px 0 #1a1009;
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.surface-button {
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: 18px;
+  min-width: 118px;
+  transform: translateX(-50%);
+}
+
+.surface-button,
+.sell-button {
+  cursor: pointer;
+}
+
+.sell-button {
+  top: clamp(148px, calc(52px + 11vw), 196px);
+}
+
+.sell-value {
+  top: clamp(185px, calc(89px + 11vw), 233px);
+  padding: 6px 8px;
+  border-color: rgba(242, 210, 156, 0.62);
+  color: #d8d8d8;
+  background: rgba(22, 14, 8, 0.68);
+  box-shadow: none;
+  font-size: 0.58rem;
+  pointer-events: none;
+  text-align: center;
+}
+
+.surface-button:hover,
+.sell-button:hover {
+  background: rgba(45, 28, 13, 0.9);
+}
+
+.surface-button:active,
+.sell-button:active {
+  box-shadow: 0 1px 0 #1a1009;
+}
+
+.surface-button:active {
+  transform: translateX(-50%) translateY(1px);
+}
+
+.sell-button:active {
+  transform: translateY(1px);
+}
+
+.energy-track {
+  position: absolute;
+  left: 18%;
+  top: 45.4%;
+  z-index: 4;
+  width: 74.8%;
+  height: 18.3%;
+  overflow: hidden;
+}
+
+.energy-track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(9.1% - 2px),
+    rgba(38, 25, 13, 0.42) calc(9.1% - 2px),
+    rgba(38, 25, 13, 0.42) 9.1%
+  );
+  pointer-events: none;
+}
+
+.energy-track i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, var(--energy-fill-light), var(--energy-fill) 52%, var(--energy-fill-dark));
+  transition: width 90ms steps(5, end);
+}
+
+@media (max-width: 520px) {
+  .energy-hud {
+    top: 4px;
+    left: 2px;
+    width: min(250px, calc(100vw - 106px));
+  }
+
+  .depth-hud {
+    top: 10px;
+    right: 10px;
+    width: 88px;
+  }
+
+  .settings-button {
+    top: 20px;
+    right: 102px;
+    width: 38px;
+    height: 28px;
+    font-size: 0.58rem;
+  }
+
+  .settings-menu {
+    top: 54px;
+    right: 10px;
+    width: min(240px, calc(100vw - 20px));
+  }
+
+  .day-hud {
+    top: 44px;
+    min-width: 112px;
+    padding: 6px 9px 7px;
+    font-size: 0.68rem;
+  }
+
+  .ore-inventory-hud {
+    top: 68px;
+    height: min(77vh, 550px);
+  }
+
+  .inventory-space-hud {
+    top: calc(68px + min(77vh, 550px) + 8px);
+    left: 6px;
+    padding: 5px 8px 6px;
+    font-size: 0.56rem;
+  }
+
+  .surface-button,
+  .sell-button,
+  .sell-value {
+    top: 104px;
+    right: 10px;
+    min-width: 80px;
+    padding-inline: 8px;
+    font-size: 0.64rem;
+  }
+
+  .surface-button {
+    top: auto;
+    right: auto;
+    bottom: 12px;
+    left: 50%;
+    min-width: 104px;
+  }
+
+  .sell-button {
+    top: 140px;
+  }
+
+  .sell-value {
+    top: 176px;
+    font-size: 0.54rem;
+  }
+}

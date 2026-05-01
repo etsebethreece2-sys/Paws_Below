@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Paws Below</title>
+    <link rel="stylesheet" href="./styles/main.css">
+  </head>
+  <body>
+    <main class="game-shell" aria-label="Paws Below">
+      <canvas id="gameCanvas" width="960" height="640" aria-label="Paws Below game canvas"></canvas>
+
+      <div id="fpsCounter" class="fps-counter" aria-label="Frames per second">FPS 0</div>
+      <div id="dayHud" class="day-hud" aria-label="Day of week">MONDAY</div>
+
+      <div class="energy-hud" aria-label="Stamina">
+        <div class="energy-meter" aria-hidden="true">
+          <div class="energy-track">
+            <i id="energyFill"></i>
+          </div>
+          <img src="./assets/energybar.png" alt="">
+        </div>
+      </div>
+
+      <div class="depth-hud" aria-label="Block depth">
+        <img src="./assets/depth.png" alt="" aria-hidden="true">
+        <strong id="depthValue">0</strong>
+      </div>
+      <button id="settingsButton" class="settings-button" type="button" aria-expanded="false" aria-controls="settingsMenu" hidden>SET</button>
+      <section id="settingsMenu" class="settings-menu" aria-label="Settings" hidden>
+        <h2>Settings</h2>
+        <label>
+          <span>Ambience</span>
+          <input id="ambienceVolumeSlider" type="range" min="0" max="100" value="100">
+        </label>
+        <label>
+          <span>Effects</span>
+          <input id="effectsVolumeSlider" type="range" min="0" max="100" value="100">
+        </label>
+        <label>
+          <span>Digging</span>
+          <input id="diggingVolumeSlider" type="range" min="0" max="100" value="100">
+        </label>
+        <label class="settings-toggle">
+          <span>Infinite coins</span>
+          <input id="infiniteCoinsToggle" type="checkbox">
+        </label>
+      </section>
+
+      <div id="oreInventoryHud" class="ore-inventory-hud" aria-label="Ore inventory">
+        <img src="./assets/oreinventory.png" alt="" aria-hidden="true">
+        <strong id="dirtInventoryValue" class="dirt-inventory-value">0</strong>
+        <strong id="pebbliteInventoryValue" class="pebblite-inventory-value">0</strong>
+        <strong id="coalclumpInventoryValue" class="coalclump-inventory-value">0</strong>
+        <strong id="copperpawInventoryValue" class="copperpaw-inventory-value">0</strong>
+        <div class="ore-inventory-locks" aria-hidden="true">
+          <span id="pebbliteInventoryLock"></span>
+          <span id="coalclumpInventoryLock"></span>
+          <span id="copperpawInventoryLock"></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <div id="inventorySpaceHud" class="inventory-space-hud" aria-label="Inventory space">
+        <span>Space</span>
+        <strong id="inventorySpaceValue">0</strong>
+      </div>
+
+      <button id="surfaceButton" class="surface-button" type="button" hidden>Surface</button>
+      <button id="sellButton" class="sell-button" type="button" hidden>Sell</button>
+      <div id="sellValue" class="sell-value" hidden>Value: 0</div>
+
+      <div id="fadeOverlay" class="fade-overlay" aria-hidden="true"></div>
+    </main>
+
+    <script src="./js/config.js"></script>
+    <script src="./js/utils/math.js"></script>
+    <script src="./js/utils/random.js"></script>
+    <script src="./js/world/tiles.js"></script>
+    <script src="./js/world/world.js"></script>
+    <script src="./js/entities/cat.js"></script>
+    <script src="./js/systems/input.js"></script>
+    <script src="./js/systems/camera.js"></script>
+    <script src="./js/systems/effects.js"></script>
+    <script src="./js/systems/audio.js"></script>
+    <script src="./js/systems/renderer.js"></script>
+    <script src="./js/systems/renderer-assets.js"></script>
+    <script src="./js/systems/renderer-sprites.js"></script>
+    <script src="./js/systems/renderer-background.js"></script>
+    <script src="./js/systems/renderer-surface.js"></script>
+    <script src="./js/systems/renderer-world.js"></script>
+    <script src="./js/systems/renderer-effects.js"></script>
+    <script src="./js/systems/renderer-ui.js"></script>
+    <script src="./js/systems/ui.js"></script>
+    <script src="./js/game-state.js"></script>
+    <script src="./js/main.js"></script>
+  </body>
+</html>
