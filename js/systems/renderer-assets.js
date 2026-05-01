@@ -647,61 +647,14 @@
   };
 
   Renderer.prototype.findImageBounds = function (image) {
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
     var width = image.naturalWidth || image.width;
     var height = image.naturalHeight || image.height;
-    var data;
-    var minX = width;
-    var minY = height;
-    var maxX = -1;
-    var maxY = -1;
-    var x;
-    var y;
-    var alpha;
-
-    canvas.width = width;
-    canvas.height = height;
-    ctx.drawImage(image, 0, 0);
-
-    try {
-      data = ctx.getImageData(0, 0, width, height).data;
-    } catch (error) {
-      return {
-        x: 0,
-        y: 0,
-        width: width,
-        height: height
-      };
-    }
-
-    for (y = 0; y < height; y += 1) {
-      for (x = 0; x < width; x += 1) {
-        alpha = data[(y * width + x) * 4 + 3];
-
-        if (alpha > 0) {
-          minX = Math.min(minX, x);
-          minY = Math.min(minY, y);
-          maxX = Math.max(maxX, x);
-          maxY = Math.max(maxY, y);
-        }
-      }
-    }
-
-    if (maxX < minX || maxY < minY) {
-      return {
-        x: 0,
-        y: 0,
-        width: width,
-        height: height
-      };
-    }
 
     return {
-      x: minX,
-      y: minY,
-      width: maxX - minX + 1,
-      height: maxY - minY + 1
+      x: 0,
+      y: 0,
+      width: width,
+      height: height
     };
   };
 
@@ -746,59 +699,11 @@
   };
 
   Renderer.prototype.findImageBoundsInRect = function (image, sx, sy, width, height) {
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    var data;
-    var minX = width;
-    var minY = height;
-    var maxX = -1;
-    var maxY = -1;
-    var x;
-    var y;
-    var alpha;
-
-    canvas.width = width;
-    canvas.height = height;
-    ctx.drawImage(image, sx, sy, width, height, 0, 0, width, height);
-
-    try {
-      data = ctx.getImageData(0, 0, width, height).data;
-    } catch (error) {
-      return {
-        x: 0,
-        y: 0,
-        width: width,
-        height: height
-      };
-    }
-
-    for (y = 0; y < height; y += 1) {
-      for (x = 0; x < width; x += 1) {
-        alpha = data[(y * width + x) * 4 + 3];
-
-        if (alpha > 0) {
-          minX = Math.min(minX, x);
-          minY = Math.min(minY, y);
-          maxX = Math.max(maxX, x);
-          maxY = Math.max(maxY, y);
-        }
-      }
-    }
-
-    if (maxX < minX || maxY < minY) {
-      return {
-        x: 0,
-        y: 0,
-        width: width,
-        height: height
-      };
-    }
-
     return {
-      x: minX,
-      y: minY,
-      width: maxX - minX + 1,
-      height: maxY - minY + 1
+      x: 0,
+      y: 0,
+      width: width,
+      height: height
     };
   };
 
